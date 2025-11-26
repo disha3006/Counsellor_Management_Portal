@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Counsellors</title>
+
+    <link th:href="@{/vendor/fontawesome-free/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background: #a7d7ee;
+        }
+        .card.lift {
+            transition: .2s ease;
+        }
+        .card.lift:hover {
+            transform: translateY(-8px);
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <div class="d-flex align-items-center">
+                <img src="/images/logo.png" class="mr-3" width="50">
+                <h5 class="text-primary font-weight-bold">Manage Counsellors</h5>
+            </div>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger btn-sm text-white" th:href="@{/logout}">Logout</a>
+                </li>
+            </ul>
+        </nav>
+        <!-- End Topbar -->
+
+
+        <div class="container-fluid">
+
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h3 class="text-gray-800">Counsellor List</h3>
+
+                <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addCounsellorModal">
+                    <i class="fas fa-plus"></i> Add Counsellor
+                </button>
+            </div>
+
+            <!-- Success message -->
+            <div th:if="${successMsg}" class="alert alert-success">
+                <span th:text="${successMsg}"></span>
+            </div>
+
+            <!-- Counsellor Table -->
+            <div class="card shadow mb-4 lift">
+                <div class="card-header">
+                    <h6 class="font-weight-bold text-primary">All Counsellors</h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr th:each="c : ${counsellors}">
+                                <td th:text="${c.id}"></td>
+                                <td th:text="${c.name}"></td>
+                                <td th:text="${c.email}"></td>
+                                <td th:text="${c.phone}"></td>
+
+                                <td>
+                                    <form th:action="@{/counsellor/delete}" method="post" style="display:inline;">
+                                        <input type="hidden" th:value="${c.id}" name="id">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <tr th:if="${#lists.isEmpty(counsellors)}">
+                                <td colspan="5" class="text-muted">No counsellors found.</td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div> <!-- /.container-fluid -->
+
+    </div> <!-- End of Main Content -->
+</div>
+
+
+<!-- Modal: Add Counsellor -->
+<div class="modal fade" id="addCounsellorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form th:action="@{/counsellor/save}" method="post" th:object="${counsellorForm}">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Counsellor</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input th:field="*{name}" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input th:field="*{email}" type="email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input th:field="*{password}" type="password" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input th:field="*{phone}" class="form-control">
+                    </div>
+
+                    <!-- role is auto-set as counsellor in controller -->
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script th:src="@{/vendor/jquery/jquery.min.js}"></script>
+<script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/sb-admin-2.min.js}"></script>
+
+</body>
+</html>

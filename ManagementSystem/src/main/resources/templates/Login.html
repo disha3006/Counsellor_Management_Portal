@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Login - Counsellor Management</title>
+
+    <!-- Fonts -->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900" rel="stylesheet">
+
+    <!-- SB Admin 2 CSS -->
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        .bg-login-image {
+            background-image: url('https://images.unsplash.com/photo-1531497865144-0464ef8fb9a5?auto=format&fit=crop&w=700&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            color: #a3a3a3;
+        }
+
+        .login-title {
+            font-weight: 700;
+            color: #4e73df;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-primary">
+
+<div class="container">
+
+    <!-- Outer Row -->
+    <div class="row justify-content-center">
+
+        <div class="col-xl-10 col-lg-12 col-md-9">
+
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+
+                    <!-- Nested Row -->
+                    <div class="row">
+
+                        <!-- LEFT IMAGE -->
+                        <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+
+                        <!-- RIGHT LOGIN FORM -->
+                        <div class="col-lg-6">
+                            <div class="p-5">
+
+                                <div class="text-center mb-4">
+                                    <h1 class="h4 login-title">Welcome Back!</h1>
+                                    <p class="text-muted">Login to continue</p>
+                                </div>
+
+                                <!-- YOUR LOGIN FORM -->
+                                <form th:action="@{/login}" method="post" class="user">
+
+                                    <div class="form-group">
+                                        <input type="email" name="email"
+                                               class="form-control form-control-user"
+                                               placeholder="Enter Email Address">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="password" name="password"
+                                               class="form-control form-control-user"
+                                               placeholder="Password">
+                                        <i class="fas fa-lock"></i>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox small">
+                                            <input type="checkbox" class="custom-control-input" id="rememberMe">
+                                            <label class="custom-control-label" for="rememberMe">Remember Me</label>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-primary btn-user btn-block" type="submit">
+                                        <i class="fas fa-sign-in-alt"></i> Login
+                                    </button>
+
+                                </form>
+
+                                <hr>
+
+                                <div class="text-center">
+                                    <a class="small" th:href="@{/register}">Not a user ? Create an Account!</a>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="js/sb-admin-2.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resolve Enquiry</title>
+
+    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/sb-admin-2.min.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f8f9fc;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card shadow" style="width: 450px;">
+    <div class="card-header bg-primary text-white text-center">
+        <h5>Resolve Enquiry</h5>
+    </div>
+
+    <div class="card-body">
+
+        <form th:action="@{/enquiry/resolve}" method="post">
+
+            <input type="hidden" name="id" th:value="${id}">
+
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Comment</label>
+                <textarea name="message" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <button class="btn btn-success btn-block" type="submit">Submit & Resolve</button>
+            <a th:href="@{/Dashboard}" class="btn btn-secondary btn-block mt-2">Cancel</a>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>
