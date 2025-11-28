@@ -9,7 +9,9 @@ public class Enquiry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String student_name;
+    @Column(name = "student_name")
+    private String studentName;
+
     private String email;
     private String class_mode;
     private String subject;
@@ -46,11 +48,11 @@ public class Enquiry {
     }
 
     public String getStudent_name() {
-        return student_name;
+        return studentName;
     }
 
     public void setStudent_name(String student_name) {
-        this.student_name = student_name;
+        this.studentName = student_name;
     }
 
     public String getEmail() {

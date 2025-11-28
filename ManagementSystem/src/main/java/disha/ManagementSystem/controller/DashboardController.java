@@ -1,14 +1,19 @@
 package disha.ManagementSystem.controller;
 
 
+import disha.ManagementSystem.ExcelExporter;
 import disha.ManagementSystem.entity.Enquiry;
 import disha.ManagementSystem.entity.User;
 
 import disha.ManagementSystem.repo.CommentsRepo;
 import disha.ManagementSystem.repo.EnquiryRepo;
 import disha.ManagementSystem.repo.UserRepo;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +37,11 @@ public class DashboardController {
     @Autowired
     private CommentsRepo msgRepo;
 
-
     @GetMapping("/Dashboard")
-    public String dashboard(Model model, HttpSession session) {
+    public String dashboard(@RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "5") int size,
+                            @RequestParam(value = "keyword", required = false) String keyword,
+                            Model model, HttpSession session) {
 
         Long userId = (Long) session.getAttribute("loggedUserId");
         String role = (String) session.getAttribute("loggedUserRole");
@@ -43,52 +50,73 @@ public class DashboardController {
 
         User loggedUser = userRepo.findById(userId).orElse(null);
 
-        List<Enquiry> enquiries;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Enquiry> enquiriesPage;
 
-        // Counsellor sees only their own enquiries
-        if ("COUNSELLOR".equalsIgnoreCase(role)) {
-            enquiries = enquiryRepo.findByCounsellor(loggedUser);
-        }
-        // Admin + student will see all enquiries
-        else {
-            enquiries = enquiryRepo.findAll();
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(role);
+
+
+        if (isAdmin) {
+            enquiriesPage = enquiryRepo.findAll(pageable);
+        } else {
+            enquiriesPage = enquiryRepo.findByCounsellor(loggedUser, pageable);
         }
 
-        model.addAttribute("enquiries", enquiries);
+        model.addAttribute("enquiries", enquiriesPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", enquiriesPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
 
         model.addAttribute("enquiryForm", new Enquiry());
-
         model.addAttribute("counsellorList", userRepo.findByRole("COUNSELLOR"));
 
 
+        long inProgress;
+        long enrolled;
+        long lost;
+        long newCount;
+
+        if (isAdmin) {
+            inProgress = enquiryRepo.countByStatus("In Progress");
+            enrolled = enquiryRepo.countByStatus("Enrolled");
+            lost = enquiryRepo.countByStatus("Lost");
+            newCount = enquiryRepo.countByStatus("New");
+        } else {
+            inProgress = enquiryRepo.countByCounsellorAndStatus(loggedUser, "In Progress");
+            enrolled = enquiryRepo.countByCounsellorAndStatus(loggedUser, "Enrolled");
+            lost = enquiryRepo.countByCounsellorAndStatus(loggedUser, "Lost");
+            newCount = enquiryRepo.countByCounsellorAndStatus(loggedUser, "New");
+        }
 
 
-        //foor charts
-        long inProgress = enquiryRepo.countByStatus("In Progress");
-        long enrolled = enquiryRepo.countByStatus("Enrolled");
-        long lost = enquiryRepo.countByStatus("Lost");
-        long newCourse = enquiryRepo.countByStatus("New");
+        long activeEnq;
+        long urgentEnq;
+        long completedEnq = msgRepo.count();
+        long totalEnq;
 
+        if (isAdmin) {
+            activeEnq = enquiryRepo.count();
+            urgentEnq = enquiryRepo.countByUrgency("High");
+        } else {
+            activeEnq = enquiryRepo.countByCounsellor(loggedUser);
+            urgentEnq = enquiryRepo.countByCounsellorAndUrgency(loggedUser, "High");
+        }
 
+        totalEnq = activeEnq + completedEnq;
 
-        long activeEnquirires = enquiryRepo.count();
-        long urgentEnquries = enquiryRepo.countByUrgency("High");
-        long completedEnquries = msgRepo.count();
-        long totalEnquries = activeEnquirires + completedEnquries;
 
         model.addAttribute("inProgressCount", inProgress);
         model.addAttribute("enrolledCount", enrolled);
         model.addAttribute("lostCount", lost);
-        model.addAttribute("newCount", newCourse);
+        model.addAttribute("newCount", newCount);
 
-        model.addAttribute("activeEnq",activeEnquirires );
-        model.addAttribute("urgent",urgentEnquries );
-        model.addAttribute("completedEnq", completedEnquries);
-        model.addAttribute("totalEnq", totalEnquries);
+        model.addAttribute("activeEnq", activeEnq);
+        model.addAttribute("urgent", urgentEnq);
+        model.addAttribute("completedEnq", completedEnq);
+        model.addAttribute("totalEnq", totalEnq);
+
         return "Dashboard";
     }
-
-
 
 
     @PostMapping("/enquiry/save")
@@ -104,7 +132,7 @@ public class DashboardController {
 
         User loggedUser = userRepo.findById(userId).orElse(null);
 
-        // COUNSELLOR → auto-assign enquiry to themselves
+        // Counsellor auto-assign enquiry to themselves
         if ("COUNSELLOR".equalsIgnoreCase(role)) {
             enq.setCounsellor(loggedUser);
         }
@@ -127,8 +155,6 @@ public class DashboardController {
     }
 
 
-
-
     @GetMapping("/profile")
     public String myprofile(Model model, HttpSession session) {
 
@@ -143,17 +169,32 @@ public class DashboardController {
         return "MyProfile";
     }
 
+
+
     @PostMapping("/profile/update")
     public String profileUpdate(@ModelAttribute("userForm") User userForm,
                                 RedirectAttributes ra) {
 
         userRepo.save(userForm);
-
         ra.addFlashAttribute("successMsg", "Profile updated successfully!");
-
         return "redirect:/profile";
     }
 
+
+    @GetMapping("/enquiry/export/excel")
+    public void exportToExcel(HttpServletResponse response) throws Exception {
+
+        response.setContentType("application/octet-stream");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=enquiries.xlsx";
+        response.setHeader(headerKey, headerValue);
+
+        List<Enquiry> listEnquiries = enquiryRepo.findAll();
+
+        ExcelExporter exporter = new ExcelExporter(listEnquiries);
+        exporter.export(response);
+    }
 
 
 

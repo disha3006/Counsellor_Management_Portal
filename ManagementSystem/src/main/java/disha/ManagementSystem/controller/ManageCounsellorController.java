@@ -24,7 +24,7 @@ public class ManageCounsellorController {
 
     @GetMapping("/manageCounsellors")
     public String manageCounsellors(Model m){
-        m.addAttribute("counsellors", userRepo.findAll());
+        m.addAttribute("counsellors", userRepo.findByRole("COUNSELLOR"));
         m.addAttribute("counsellorForm", new User());
         return "CounsellorMgmt";
     }

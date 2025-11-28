@@ -29,7 +29,7 @@
         <!-- Topbar -->
         <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
             <div class="d-flex align-items-center">
-                <img src="/images/logo.png" class="mr-3" width="50">
+                <img th:src="@{/img/logo.jpg}" class="mr-3" width="50">
                 <h5 class="text-primary font-weight-bold">Manage Counsellors</h5>
             </div>
 
@@ -42,16 +42,25 @@
         <!-- End Topbar -->
 
 
+
+
         <div class="container-fluid">
 
             <!-- Page Heading -->
-            <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                <h3 class="text-gray-800">Counsellor List</h3>
+            <div>
+                <h1 class="h4 text-gray-800 font-weight-bold">Manage Counsellors</h1>
+                <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                    <a th:href="@{/Dashboard}" class="btn btn-primary btn-sm shadow-sm">
+                        <i class="fas fa-arrow-left ml-2"></i> Back to Dashboard
+                    </a>
 
-                <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addCounsellorModal">
-                    <i class="fas fa-plus"></i> Add Counsellor
-                </button>
+                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addCounsellorModal">
+                        <i class="fas fa-plus"></i> Add Counsellor
+                    </button>
+                </div>
             </div>
+
+
 
             <!-- Success message -->
             <div th:if="${successMsg}" class="alert alert-success">

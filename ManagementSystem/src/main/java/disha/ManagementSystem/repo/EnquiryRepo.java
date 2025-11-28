@@ -10,15 +10,17 @@ import java.util.List;
 
 public interface EnquiryRepo extends JpaRepository<Enquiry, Long> {
 
-    Page<Enquiry> findByCounsellorId(Long userId, Pageable pageable);
+    // Pagination
+    Page<Enquiry> findByCounsellor(User counsellor, Pageable pageable);
 
-    List<Enquiry> findByEmail(String email);
+    // Logged-in counsellor only
+    long countByCounsellor(User counsellor);
+    long countByCounsellorAndStatus(User counsellor, String status);
+    long countByCounsellorAndUrgency(User counsellor, String urgency);
 
-    List<Enquiry> findByCounsellor(User loggedUser);
-
+    // Admin (overall)
     long countByStatus(String status);
-
     long countByUrgency(String urgency);
-
 }
+
 
